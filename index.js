@@ -21,9 +21,7 @@ io.on("connection", (socket) => {
   socket.on("disconnect", function () {
     console.log("Got disconnect!");
   });
-  io.emit("Alert", "Hei",()=>{
-    console.log("Sent Alert");
-  });
+  io.emit("Alert", "Hei")
   socket.on("pong", function (data) {
     console.log(data);
   });
