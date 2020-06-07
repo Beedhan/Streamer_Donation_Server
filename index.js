@@ -15,42 +15,42 @@ const server = app.listen(port, () => {
 
 const io = socketio(server);
 
-io.on("connection", socket => {
-  io.emit("Alert", "Hei");
-
+io.on("connection", (socket) => {
+  
   console.log("COnnected");
-  socket.on("disconnect", function() {
+  socket.on("disconnect", function () {
     console.log("Got disconnect!");
   });
-socket.on("pong", function(data) {
+  io.emit("Alert", "Hei",()=>{
+    console.log("Sent Alert");
+  });
+  socket.on("pong", function (data) {
     console.log(data);
   });
-  socket.on("Donated", msg => {
+  socket.on("Donated", (msg) => {
     console.log(msg);
     let data = {
       token: msg.token,
-      amount: msg.amount
+      amount: msg.amount,
     };
     let config = {
       headers: {
         Authorization:
           process.env.KhaltiSecret ||
-          `Key test_secret_key_0a6b63fb056641b9b78fae20fe65d46d`
-      }
+          `Key test_secret_key_0a6b63fb056641b9b78fae20fe65d46d`,
+      },
     };
     axios
       .post("https://khalti.com/api/v2/payment/verify/", data, config)
-      .then(response => {
+      .then((response) => {
         console.log("Alerted");
         if (response.data.state.name === "Completed") {
           io.emit("Alert", msg);
           console.log("Completed");
         }
       })
-      .catch(error => {
+      .catch((error) => {
         console.log(error);
       });
   });
-
-  
 });
