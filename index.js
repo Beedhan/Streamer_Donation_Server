@@ -62,11 +62,20 @@ const io = socketio(server);
 //Socketio logics
 
 io.on("connect", (socket) => {
+ 
   socket.on("room", (roomCode) => {
-    console.log(roomCode);
+    console.log(roomCode,"Id");
     socket.join(roomCode);
     io.to(roomCode).emit("check", `Hello ${roomCode}`);
 
+    socket.on("testing",()=>{
+      console.log("Testing Connected");
+      io.to(roomCode).emit("Alert", {
+              donatorName:"Test",
+              donationAmount:69,
+             donationMessage:"This is a test",
+      });
+    })
     socket.on("Donated", (msg) => {
       console.log(msg);
       let data = {
@@ -86,6 +95,7 @@ io.on("connect", (socket) => {
           if (response.data.state.name === "Completed") {
             //Saving donation in history
             const user = await UserData.findOneAndUpdate({ token: roomCode },{$inc:{amount:msg.donationAmount,totalAmount:msg.donationAmount}});
+            //^ updating user earned amounts
             console.log(moment().format());
             new AlertsHistoryModel({
               googleId: user.googleId,
@@ -96,6 +106,7 @@ io.on("connect", (socket) => {
               .save()
               .then(() => {
                 io.to(roomCode).emit("Alert", msg);
+                io.to(msg.donationPageId).emit("thanksForDonation", "true,Thanks yrr");
                 console.log("Completed");
               });
           }
@@ -105,6 +116,7 @@ io.on("connect", (socket) => {
         });
     });
 
+  
     socket.on("disconnect", () => {
       console.log("Disconnected from " + roomCode);
     });
