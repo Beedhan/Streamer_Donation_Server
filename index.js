@@ -25,7 +25,7 @@ const moment = require('moment');
 //Mongoose Connect
 mongoose
   .connect(
-    "mongodb+srv://beedhan:1905@donationcluster-z8dvs.mongodb.net/<dbname>?retryWrites=true&w=majority",
+    process.env.MONGO_URL,
     { useUnifiedTopology: true, useNewUrlParser: true,useFindAndModify: false}
   )
   .then(() => {
@@ -85,8 +85,7 @@ io.on("connect", (socket) => {
       let config = {
         headers: {
           Authorization:
-            process.env.KhaltiSecret ||
-            `Key test_secret_key_0a6b63fb056641b9b78fae20fe65d46d`,
+            process.env.KhaltiSecret,
         },
       };
       axios
